@@ -1,0 +1,46 @@
+---
+cog_bundle_version: 3
+name: pingdom
+version: 0.0.13
+docker:
+  image: cogcmd/pingdom
+  tag: 0.0.13
+permissions:
+  - pingdom:check
+commands:
+  check:
+    executable: /home/bundle/cog-command
+    documentation: |
+      pingdom:check list - retrieve list of all checks
+      pingdom:check show <id> - get detailed information for a specific check
+      pingdom:check results <id> --count=count - retrieve 'count' raw check results for a specific check. Defaults to 1.
+
+      Returns one or more Pingdom "check" resources (see
+      https://www.pingdom.com/resources/api#ResourceChecks) or
+      "result" resources (see
+      https://www.pingdom.com/resources/api#ResourceResults) as JSON
+      maps.
+
+      Must be configured with the following environment variables (see
+      http://docs.operable.io/docs/dynamic-command-configuration for
+      further details):
+
+        PINGDOM_USER_EMAIL
+        PINGDOM_USER_PASSWORD
+        PINGDOM_APPLICATION_KEY
+
+      The email and password values are the Pingdom account
+      credentials that will be used to authenticate with the
+      service. The application key is as described at
+      https://www.pingdom.com/resources/api.
+    options:
+      count:
+        type: int
+        required: false
+        short_flag: c
+    rules:
+      - 'when command is pingdom:check must have pingdom:check'
+templates:
+  check:
+    slack: '{{name}} ({{hostname}}) is currently `{{status}}`'
+    hipchat: '{{name}} ({{hostname}}) is currently {{status}}'
