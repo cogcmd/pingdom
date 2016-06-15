@@ -15,7 +15,6 @@ class CogCmd::Pingdom::Check < Cog::Command
     when "show"
       args.shift
       if id = args[0]
-        id = id.to_f.to_i # TODO: Temporary hacky workaround for Go's JSON shenanigans
         api_response = make_api_request("/checks/#{id}")
         response.content = JSON.parse(api_response.body)["check"]
       else
@@ -24,9 +23,8 @@ class CogCmd::Pingdom::Check < Cog::Command
     when "results"
       args.shift
       if id = args[0]
-        id = id.to_f.to_i # TODO: Temporary hacky workaround for Go's JSON shenanigans
         limit = if count = request.options["count"]
-                  count.to_i
+                  Integer(count)
                  else
                    1
                  end
@@ -77,10 +75,9 @@ class CogCmd::Pingdom::Check < Cog::Command
       case resp
       when Net::HTTPSuccess
         resp
-      when Net::HTTPUnauthorized
-        fail("Failed to authenticate with Pingdom")
       else
-        fail("Failed: #{resp.value}")
+        error = JSON.parse(resp.body)["error"]
+        fail("Pingdom API Request Failure: #{error["statuscode"]} (#{error["statusdesc"]}) -  #{error["errormessage"]}")
       end
     end
   end
