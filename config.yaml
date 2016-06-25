@@ -2,6 +2,7 @@
 cog_bundle_version: 3
 name: pingdom
 version: 0.0.16
+description: The pingdom bundle
 docker:
   image: cogcmd/pingdom
   tag: 0.0.16
@@ -10,6 +11,7 @@ permissions:
 commands:
   check:
     executable: /home/bundle/cog-command
+    description: Returns one or more "check" resources
     documentation: |
       pingdom:check list - retrieve list of all checks
       pingdom:check show <id> - get detailed information for a specific check
