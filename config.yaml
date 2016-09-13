@@ -1,28 +1,31 @@
 ---
-cog_bundle_version: 3
+cog_bundle_version: 4
 name: pingdom
 description: Interact with Pingdom API
-version: 0.0.16
+author: Operable <support@operable.io>
+homepage: https://github.com/cogcmd/pingdom
+version: 0.0.17
 docker:
   image: cogcmd/pingdom
-  tag: 0.0.16
+  tag: 0.0.17
 permissions:
   - pingdom:check
 commands:
   check:
     executable: /home/bundle/cog-command
     description: Retrieve information about one or more checks
-    documentation: |
-      pingdom:check list - retrieve list of all checks
-      pingdom:check show <id> - get detailed information for a specific check
-      pingdom:check results <id> --count=count - retrieve 'count' raw check results for a specific check. Defaults to 1.
-
+    arguments: "[subcommand]"
+    subcommands:
+      list: retrieve list of all checks
+      "show <id>": get detailed information for a specific check
+      "results <id> [--count=count]": retrieve 'count' raw check results for a specific check. Defaults to 1.
+    long_description: |
       Returns one or more Pingdom "check" resources (see
       https://www.pingdom.com/resources/api#ResourceChecks) or
       "result" resources (see
       https://www.pingdom.com/resources/api#ResourceResults) as JSON
       maps.
-
+    notes: |
       Must be configured with the following environment variables (see
       http://docs.operable.io/docs/dynamic-command-configuration for
       further details):
@@ -37,6 +40,7 @@ commands:
       https://www.pingdom.com/resources/api.
     options:
       count:
+        description: Number of raw check results to return
         type: int
         required: false
         short_flag: c
@@ -44,5 +48,7 @@ commands:
       - 'when command is pingdom:check must have pingdom:check'
 templates:
   check:
-    slack: '{{name}} ({{hostname}}) is currently `{{status}}`'
-    hipchat: '{{name}} ({{hostname}}) is currently {{status}}'
+    body: |
+      ~each var=$results~
+      ~$item.name~ (~$item.hostname~) is currently ~$item.status~
+      ~end~
